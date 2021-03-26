@@ -26,11 +26,10 @@ import org.junit.Test;
  */
 public class SshTest {
 
-    @Test
+    @Test(expected = java.io.IOException.class)
     @SneakyThrows
     public void sshSayHello(){
         Shell shell = new SshByPassword("172.16.110.6", 22, "root", "123456");
-        System.out.println(shell.toString());
         String stdout = new Shell.Plain(shell).exec("echo 'Hello, world!'");
         System.out.println(stdout);
     }
