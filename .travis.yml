@@ -24,4 +24,4 @@ matrix:
 
 install: /bin/true
 script:
-  - mvn package -rf -Dmaven.javadoc.skip=true -V -B -e
+  - mvn package -Dmaven.javadoc.skip=true -V -B -e
